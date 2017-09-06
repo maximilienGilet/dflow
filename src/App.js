@@ -78,6 +78,8 @@ class DzTrack extends React.Component {
     render() {
         if (this.props.track) {
             var size = this.props.size ? this.props.size : "128"
+
+            console.log(window.DZ.player.getVolume());
             return (
                 <div>
                     <img src={this.props.track.album.cover} width={size} />
@@ -86,6 +88,7 @@ class DzTrack extends React.Component {
                     <div>
                         <button onClick={() => this.togglePlayer()}>{this.state.btnText}</button>
                     </div>
+                    <DzVolume volume={window.DZ.player.getVolume()}/>
                 </div>
             )
         }
@@ -121,6 +124,27 @@ class DzProgress extends React.Component {
         )
 
 
+    }
+}
+
+class DzVolume extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            volume: props.volume
+        }
+    }
+
+    changeVolume(e) {
+        window.DZ.player.setVolume(e.target.value);
+    }
+
+    render() {
+        var value = this.state.volume;
+
+        return (
+            <input type="range" onChange={this.changeVolume} />
+        )
     }
 }
 
