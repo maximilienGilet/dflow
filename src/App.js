@@ -26,6 +26,7 @@ class App extends Component {
                 window.DZ.api('/user/me', function(response) {
                     console.log('Good to see you, ' + response.name + '.');
                     thisReact.setState({user: response});
+                    window.DZ.player.setRepeat(1);
                 });
             } else {
                 console.log('User cancelled login or did not fully authorize.');
@@ -79,7 +80,6 @@ class DzTrack extends React.Component {
         if (this.props.track) {
             var size = this.props.size ? this.props.size : "128"
 
-            console.log(window.DZ.player.getVolume());
             return (
                 <div>
                     <img src={this.props.track.album.cover} width={size} />
@@ -171,12 +171,21 @@ class DzFlowList extends React.Component{
 
     }
 
+    playTracks(id){
+        var firstIndex = this.state.playlist.indexOf(this.state.playlist.find(function(o){return o.id == id}));
+        var tracksToPlay = this.state.playlist.slice(firstIndex, -1);
+        var tracklist = tracksToPlay.map(function(track){
+            return track.id;
+        });
+        window.DZ.player.playTracks(tracklist);
+    }
+
     render(){
 
         if (this.state.playlist){
             var songs = this.state.playlist;
             const listItems = songs.map((song) =>
-              <li>{song.artist.name} - {song.title} <button onClick={() => window.DZ.player.playTracks([song.id])}>Play</button></li>
+              <li>{song.artist.name} - {song.title} <button onClick={() => this.playTracks(song.id)}>Play</button></li>
             );
 
             return (
