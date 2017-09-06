@@ -11,6 +11,8 @@ class App extends Component {
     }
 
     componentDidMount() {
+        var thisReact = this;
+
         window.DZ.init({
             'appId': '251042',
             'channelUrl': 'http://react.dev/',
@@ -23,22 +25,12 @@ class App extends Component {
                 console.log('Welcome!  Fetching your information.... ');
                 window.DZ.api('/user/me', function(response) {
                     console.log('Good to see you, ' + response.name + '.');
-                    window.user = response;
+                    thisReact.setState({user: response});
                 });
             } else {
                 console.log('User cancelled login or did not fully authorize.');
             }
         }, {perms: 'basic_access,email'});
-
-        var thisReact = this;
-        var logUser = setInterval(function(){
-            if (window.user){
-                clearInterval(logUser);
-                thisReact.setState({user: window.user});
-            }
-        }, 1000);
-
-
     }
 
     render() {
@@ -59,11 +51,47 @@ class App extends Component {
         return (
             <div>
                 {this.state.user.firstname}{this.state.user.lastname}
-                <button onClick={() => window.DZ.player.pause()}>Pause</button>
-                <button onClick={() => window.DZ.player.play()}>Resume</button>
-                <DzProgress id="progress"/>
                 <DzFlowList dz-user={this.state.user} />
             </div>
+        )
+    }
+}
+
+class DzTrack extends React.Component {
+    constructor() {
+        super();
+        this.state = {
+            btnText: "Pause"
+        }
+    }
+
+    togglePlayer() {
+        if (window.DZ.player.isPlaying()){
+            window.DZ.player.pause();
+            this.setState({btnText: "Resume"});
+        } else {
+            window.DZ.player.play();
+            this.setState({btnText: "Pause"});
+        }
+    }
+
+    render() {
+        if (this.props.track) {
+            var size = this.props.size ? this.props.size : "128"
+            return (
+                <div>
+                    <img src={this.props.track.album.cover} width={size} />
+                    <DzProgress id="progress"/>
+                    <div>{this.props.track.artist.name} - {this.props.track.title}</div>
+                    <div>
+                        <button onClick={() => this.togglePlayer()}>{this.state.btnText}</button>
+                    </div>
+                </div>
+            )
+        }
+
+        return (
+            <div/>
         )
     }
 }
@@ -101,23 +129,22 @@ class DzFlowList extends React.Component{
     constructor (){
         super();
         this.state = {
-            playlist: null
+            playlist: null,
+            track: null
         };
     }
 
     componentDidMount() {
+        var thisReact = this;
         window.DZ.api('/user/me/flow', function(response) {
-            window.playlist = response.data;
+            thisReact.setState({playlist: response.data});
         });
 
+        window.DZ.Event.subscribe('current_track', function(newTrack){
+            var track = thisReact.state.playlist.find(function(o){return o.id == newTrack.track.id});
+            thisReact.setState({track: track});
+        });
 
-        var thisReact = this;
-        var loadPlaylist = setInterval(function(){
-            if (window.playlist){
-                clearInterval(loadPlaylist);
-                thisReact.setState({playlist: window.playlist});
-            }
-        }, 1000);
     }
 
     render(){
@@ -130,6 +157,7 @@ class DzFlowList extends React.Component{
 
             return (
                 <div>
+                    <DzTrack track={this.state.track}/>
                     <h3>Dz Flow List</h3>
                     <ul>{listItems}</ul>
                 </div>
