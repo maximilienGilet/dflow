@@ -16,8 +16,10 @@ class App extends Component {
         window.DZ.init({
             'appId': '251042',
             'channelUrl': 'http://react.dev/',
-            player : {
-                onload : function(){}
+            'player' : {
+                onload : function(){
+                    window.DZ.player.setRepeat(1);
+                }
             }
         });
         window.DZ.login(function(response) {
@@ -26,9 +28,6 @@ class App extends Component {
                 window.DZ.api('/user/me', function(response) {
                     console.log('Good to see you, ' + response.name + '.');
                     thisReact.setState({user: response});
-                    window.DZ.Event.subscribe('player_loaded', function(){
-                        window.DZ.player.setRepeat(1);
-                    });
                 });
             } else {
                 console.log('User cancelled login or did not fully authorize.');
@@ -109,8 +108,11 @@ class DzProgress extends React.Component {
         var that = this;
         window.DZ.Event.subscribe('player_position', function(arg){
 			window.DZ.player.progress = arg;
-			document.getElementById(that.props.id).setAttribute('max', arg[1]);
-            document.getElementById(that.props.id).setAttribute('value', arg[0]);
+            var el = document.getElementById(that.props.id);
+            if (el){
+                el.setAttribute('max', arg[1]);
+                el.setAttribute('value', arg[0]);
+            }
 		});
     }
 
@@ -164,14 +166,19 @@ class DzFlowList extends React.Component{
         });
 
         window.DZ.Event.subscribe('current_track', function(newTrack){
-            var track = thisReact.state.playlist.find(function(o){return o.id === newTrack.track.id});
+            var track = thisReact.state.playlist.find(function(o){
+                return o.id == newTrack.track.id;
+            });
             thisReact.setState({track: track});
         });
 
     }
 
-    playTracks(id){
-        var firstIndex = this.state.playlist.indexOf(this.state.playlist.find(function(o){return o.id === id}));
+    playTracks(track){
+        var id = track.id;
+        var firstIndex = this.state.playlist.indexOf(this.state.playlist.find(function(o){
+            return o.id == id
+        }));
         var tracksToPlay = this.state.playlist.slice(firstIndex, -1);
         var tracklist = tracksToPlay.map(function(track){
             return track.id;
@@ -184,7 +191,7 @@ class DzFlowList extends React.Component{
         if (this.state.playlist){
             var songs = this.state.playlist;
             const listItems = songs.map((song) =>
-              <li key={song.id}>{song.artist.name} - {song.title} <button onClick={() => this.playTracks(song.id)}>Play</button></li>
+              <li key={song.id}>{song.artist.name} - {song.title} <button onClick={() => this.playTracks(song)}>Play</button></li>
             );
 
             return (
