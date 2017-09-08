@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import './App.css';
 
+var DZ = window.DZ;
+
 class App extends Component {
 
     constructor() {
@@ -13,19 +15,19 @@ class App extends Component {
     componentDidMount() {
         var thisReact = this;
 
-        window.DZ.init({
+        DZ.init({
             'appId': '251042',
             'channelUrl': 'http://react.dev/',
             'player' : {
                 onload : function(){
-                    window.DZ.player.setRepeat(1);
+                    DZ.player.setRepeat(1);
                 }
             }
         });
-        window.DZ.login(function(response) {
+        DZ.login(function(response) {
             if (response.authResponse) {
                 console.log('Welcome!  Fetching your information.... ');
-                window.DZ.api('/user/me', function(response) {
+                DZ.api('/user/me', function(response) {
                     console.log('Good to see you, ' + response.name + '.');
                     thisReact.setState({user: response});
                 });
@@ -36,16 +38,8 @@ class App extends Component {
     }
 
     render() {
-        // console.log(logUser);
-        // if (window.user){
-        //
-        //     clearInterval(logUser);
-        // }
         return this.state.user ? this.renderApp() : (
             <div>Loading...</div>
-            // <Fetch url="https://cors-anywhere.herokuapp.com/http://api.deezer.com/user/me" mode="no-cors">
-            //   <TestComponent/>
-            // </Fetch>
         );
     }
 
@@ -68,11 +62,11 @@ class DzTrack extends React.Component {
     }
 
     togglePlayer() {
-        if (window.DZ.player.isPlaying()){
-            window.DZ.player.pause();
+        if (DZ.player.isPlaying()){
+            DZ.player.pause();
             this.setState({btnText: "Resume"});
         } else {
-            window.DZ.player.play();
+            DZ.player.play();
             this.setState({btnText: "Pause"});
         }
     }
@@ -91,7 +85,7 @@ class DzTrack extends React.Component {
                         <button onClick={() => this.togglePlayer()}>{this.state.btnText}</button>
                         <DzNextBtn/>
                     </div>
-                    <DzVolume volume={window.DZ.player.getVolume()}/>
+                    <DzVolume volume={DZ.player.getVolume()}/>
                 </div>
             )
         }
@@ -104,29 +98,35 @@ class DzTrack extends React.Component {
 
 class DzProgress extends React.Component {
 
+    constructor(){
+        super();
+        this.state = {
+            value: 0,
+            max: 0,
+        }
+    }
+
     componentDidMount() {
         var that = this;
-        window.DZ.Event.subscribe('player_position', function(arg){
-			window.DZ.player.progress = arg;
-            var el = document.getElementById(that.props.id);
-            if (el){
-                el.setAttribute('max', arg[1]);
-                el.setAttribute('value', arg[0]);
-            }
+        DZ.Event.subscribe('player_position', function(arg){
+            that.setState({
+                value: arg[0],
+                max: arg[1]
+            });
 		});
     }
 
     render() {
-        if (window.DZ.player.progress) {
-            return (
-                <progress id={this.props.id} max={window.DZ.player.progress[1]} value={window.DZ.player.progress[0]}></progress>
-            )
-        }
+        var timeValue = new Date(this.state.value * 1000).toISOString().substr(14, 5);
+        var timeMax = new Date(this.state.max * 1000).toISOString().substr(14, 5);
+
         return (
-            <progress id={this.props.id} max="100" value="0"></progress>
+            <div>
+                {timeValue}
+                <progress id={this.props.id} max={this.state.max} value={this.state.value}></progress>
+                {timeMax}
+            </div>
         )
-
-
     }
 }
 
@@ -139,7 +139,7 @@ class DzVolume extends React.Component {
     }
 
     changeVolume(e) {
-        window.DZ.player.setVolume(e.target.value);
+        DZ.player.setVolume(e.target.value);
     }
 
     render() {
@@ -163,8 +163,7 @@ class DzFlowList extends React.Component{
         var thisReact = this;
         this.loadMoreTracks();
 
-        window.DZ.Event.subscribe('current_track', function(newTrack){
-            console.log('track changed');
+        DZ.Event.subscribe('current_track', function(newTrack){
             var track = thisReact.state.playlist.find(function(o){
                 return o.id == newTrack.track.id;
             });
@@ -181,10 +180,10 @@ class DzFlowList extends React.Component{
 
     loadMoreTracks() {
         var thisReact = this;
-        window.DZ.api('/user/me/flow', function(response) {
+        DZ.api('/user/me/flow', function(response) {
             thisReact.setState({playlist: thisReact.state.playlist.concat(response.data)});
             var ids = response.data.map(function(track){ return track.id });
-            window.DZ.player.addToQueue(ids);
+            DZ.player.addToQueue(ids);
         });
     }
 
@@ -197,7 +196,7 @@ class DzFlowList extends React.Component{
         var tracklist = tracksToPlay.map(function(track){
             return track.id;
         });
-        window.DZ.player.playTracks(tracklist);
+        DZ.player.playTracks(tracklist);
     }
 
     render(){
@@ -227,7 +226,7 @@ class DzFlowList extends React.Component{
 class DzNextBtn extends React.Component {
     render(){
         return (
-            <button onClick={() => window.DZ.player.next()}>NEXT</button>
+            <button onClick={() => DZ.player.next()}>NEXT</button>
         )
     }
 }
@@ -235,7 +234,7 @@ class DzNextBtn extends React.Component {
 class DzPrevBtn extends React.Component {
     render(){
         return (
-            <button onClick={() => window.DZ.player.prev()}>PREV</button>
+            <button onClick={() => DZ.player.prev()}>PREV</button>
         )
     }
 }
