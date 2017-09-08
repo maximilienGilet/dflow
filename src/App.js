@@ -63,7 +63,7 @@ class DzTrack extends React.Component {
     constructor() {
         super();
         this.state = {
-            btnText: "Pause"
+            btnText: "Play"
         }
     }
 
@@ -154,24 +154,38 @@ class DzFlowList extends React.Component{
     constructor (){
         super();
         this.state = {
-            playlist: null,
+            playlist: [],
             track: null
         };
     }
 
     componentDidMount() {
         var thisReact = this;
-        window.DZ.api('/user/me/flow', function(response) {
-            thisReact.setState({playlist: response.data});
-        });
+        this.loadMoreTracks();
 
         window.DZ.Event.subscribe('current_track', function(newTrack){
+            console.log('track changed');
             var track = thisReact.state.playlist.find(function(o){
                 return o.id == newTrack.track.id;
             });
             thisReact.setState({track: track});
-        });
 
+            // Auto load next tracks when playing the last track
+            var index = thisReact.state.playlist.indexOf(track);
+            if (thisReact.state.playlist.length === index + 1 ){
+                console.log('load more tracks');
+                thisReact.loadMoreTracks();
+            }
+        });
+    }
+
+    loadMoreTracks() {
+        var thisReact = this;
+        window.DZ.api('/user/me/flow', function(response) {
+            thisReact.setState({playlist: thisReact.state.playlist.concat(response.data)});
+            var ids = response.data.map(function(track){ return track.id });
+            window.DZ.player.addToQueue(ids);
+        });
     }
 
     playTracks(track){
@@ -179,7 +193,7 @@ class DzFlowList extends React.Component{
         var firstIndex = this.state.playlist.indexOf(this.state.playlist.find(function(o){
             return o.id == id
         }));
-        var tracksToPlay = this.state.playlist.slice(firstIndex, -1);
+        var tracksToPlay = this.state.playlist.slice(firstIndex);
         var tracklist = tracksToPlay.map(function(track){
             return track.id;
         });
@@ -188,7 +202,7 @@ class DzFlowList extends React.Component{
 
     render(){
 
-        if (this.state.playlist){
+        if (this.state.playlist.length > 0){
             var songs = this.state.playlist;
             const listItems = songs.map((song) =>
               <li key={song.id}>{song.artist.name} - {song.title} <button onClick={() => this.playTracks(song)}>Play</button></li>
@@ -199,6 +213,7 @@ class DzFlowList extends React.Component{
                     <DzTrack track={this.state.track}/>
                     <h3>Dz Flow List</h3>
                     <ul>{listItems}</ul>
+                    <button onClick={() => this.loadMoreTracks()}>Load more tracks</button>
                 </div>
             )
         }
