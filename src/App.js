@@ -86,7 +86,9 @@ class DzTrack extends React.Component {
                     <DzProgress id="progress"/>
                     <div>{this.props.track.artist.name} - {this.props.track.title}</div>
                     <div>
+                        <DzPrevBtn/>
                         <button onClick={() => this.togglePlayer()}>{this.state.btnText}</button>
+                        <DzNextBtn/>
                     </div>
                     <DzVolume volume={window.DZ.player.getVolume()}/>
                 </div>
@@ -200,6 +202,30 @@ class DzFlowList extends React.Component{
         return <div/>
 
 
+    }
+}
+
+class DzNextBtn extends React.Component {
+    constructor() {
+        super();
+    }
+
+    render(){
+        return (
+            <button onClick={() => window.DZ.player.next()}>NEXT</button>
+        )
+    }
+}
+
+class DzPrevBtn extends React.Component {
+    constructor() {
+        super();
+    }
+
+    render(){
+        return (
+            <button onClick={() => window.DZ.player.prev()}>PREV</button>
+        )
     }
 }
 
