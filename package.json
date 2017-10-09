@@ -4,7 +4,10 @@
   "private": true,
   "dependencies": {
     "react": "^15.6.1",
+    "react-debounce-input": "^3.1.0",
     "react-dom": "^15.6.1",
+    "react-feather": "^1.0.7",
+    "react-rangeslider": "^2.2.0",
     "react-scripts": "1.0.13"
   },
   "scripts": {

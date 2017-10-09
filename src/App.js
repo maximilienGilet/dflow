@@ -1,7 +1,58 @@
 import React, { Component } from 'react';
 import './App.css';
+import classNames from 'classnames';
+import * as Icon from 'react-feather';
+import {DebounceInput} from 'react-debounce-input';
 
 var DZ = window.DZ;
+
+function dateToStr(secs){
+    return new Date(secs * 1000).toISOString().substr(14, 5);
+}
+
+function togglePlayer() {
+    if (DZ.player.isPlaying()){
+        DZ.player.pause();
+    } else {
+        DZ.player.play();
+    }
+}
+
+function throttle(callback, delay) {
+    var last;
+    var timer;
+    return function () {
+        var context = this;
+        var now = +new Date();
+        var args = arguments;
+        if (last && now < last + delay) {
+            // le délai n'est pas écoulé on reset le timer
+            clearTimeout(timer);
+            timer = setTimeout(function () {
+                last = now;
+                callback.apply(context, args);
+            }, delay);
+        } else {
+            last = now;
+            callback.apply(context, args);
+        }
+    };
+}
+
+function debounce(func, wait, immediate) {
+	var timeout;
+	return function() {
+		var context = this, args = arguments;
+		var later = function() {
+			timeout = null;
+			if (!immediate) func.apply(context, args);
+		};
+		var callNow = immediate && !timeout;
+		clearTimeout(timeout);
+		timeout = setTimeout(later, wait);
+		if (callNow) func.apply(context, args);
+	};
+};
 
 class App extends Component {
 
@@ -39,15 +90,27 @@ class App extends Component {
 
     render() {
         return this.state.user ? this.renderApp() : (
-            <div>Loading...</div>
+            <div className="loader">
+                <span className="loader-item"></span>
+                <span className="loader-item"></span>
+                <span className="loader-item"></span>
+            </div>
         );
     }
 
     renderApp() {
         return (
             <div>
-                {this.state.user.firstname}{this.state.user.lastname}
-                <DzFlowList dz-user={this.state.user} />
+                {/* <button className="user button">
+                    <Icon.User className="user-icon"/>
+                    <span className="user-text">{this.state.user.firstname} {this.state.user.lastname}</span>
+                </button> */}
+                <div className="app">
+                    <DzFlowList dz-user={this.state.user}/>
+                    {/* <div className="controls"> */}
+
+                    {/* </div> */}
+                </div>
             </div>
         )
     }
@@ -57,35 +120,44 @@ class DzTrack extends React.Component {
     constructor() {
         super();
         this.state = {
-            btnText: "Play"
-        }
-    }
-
-    togglePlayer() {
-        if (DZ.player.isPlaying()){
-            DZ.player.pause();
-            this.setState({btnText: "Resume"});
-        } else {
-            DZ.player.play();
-            this.setState({btnText: "Pause"});
+            btnText: "Play",
+            isPlaying: false
         }
     }
 
     render() {
         if (this.props.track) {
-            var size = this.props.size ? this.props.size : "128"
+            var that = this;
+            var containerStyle = {
+                'backgroundImage': 'url(' + this.props.track.album.cover_big + ')'
+            };
 
             return (
-                <div>
-                    <img src={this.props.track.album.cover} width={size}  alt="Album Art" />
-                    <DzProgress id="progress"/>
-                    <div>{this.props.track.artist.name} - {this.props.track.title}</div>
-                    <div>
-                        <DzPrevBtn/>
-                        <button onClick={() => this.togglePlayer()}>{this.state.btnText}</button>
-                        <DzNextBtn/>
+                <div className="track">
+                    <div className="background-container" style={containerStyle}>
                     </div>
-                    <DzVolume volume={DZ.player.getVolume()}/>
+                    <div className="album-container">
+                        <div className="album">
+                            <img className={classNames({'spin': that.state.isPlaying, 'album-art': true})} src={this.props.track.album.cover_big} alt="Album Art" />
+                        </div>
+                        <div className="container">
+                            <div>
+                                <h3 className="trackTitle" title={this.props.track.title}>{this.props.track.title}</h3>
+                                <h4 className="trackArtist" title={this.props.track.artist.name}>{this.props.track.artist.name}</h4>
+                            </div>
+                            <div className="media-controls">
+                                <div className="media-buttons">
+                                    <DzProgress id="progress"/>
+                                    <div className="buttons">
+                                        {/* <div className="volume-container"><Icon.Volume2 className="rotate90"/><DzVolume volume={DZ.player.getVolume()}/></div> */}
+                                        <DzPrevBtn/>
+                                        <DzPlayBtn/>
+                                        <DzNextBtn/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             )
         }
@@ -103,6 +175,7 @@ class DzProgress extends React.Component {
         this.state = {
             value: 0,
             max: 0,
+            clicked: false
         }
     }
 
@@ -116,15 +189,29 @@ class DzProgress extends React.Component {
 		});
     }
 
+    onChange(event){
+        var thisReact = this;
+        DZ.player.seek((event.target.value/thisReact.state.max)*100);
+    }
+
     render() {
-        var timeValue = new Date(this.state.value * 1000).toISOString().substr(14, 5);
-        var timeMax = new Date(this.state.max * 1000).toISOString().substr(14, 5);
+        var timeValue = dateToStr(this.state.value);
+        var timeMax = dateToStr(this.state.max);
 
         return (
-            <div>
-                {timeValue}
-                <progress id={this.props.id} max={this.state.max} value={this.state.value}></progress>
-                {timeMax}
+            <div className="progress">
+                <div className="progress-values">
+                    <div>{timeValue}</div>
+                    <div>{timeMax}</div>
+                </div>
+                {/* <progress className="progressbar" id={this.props.id} max={this.state.max} value={this.state.value}></progress> */}
+                <DebounceInput
+                    type="range"
+                    value={this.state.value}
+                    max={this.state.max}
+                    debounceTimeout={300}
+                    onChange={(evt) => this.onChange(evt)}
+                />
             </div>
         )
     }
@@ -203,16 +290,26 @@ class DzFlowList extends React.Component{
 
         if (this.state.playlist.length > 0){
             var songs = this.state.playlist;
-            const listItems = songs.map((song) =>
-              <li key={song.id}>{song.artist.name} - {song.title} <button onClick={() => this.playTracks(song)}>Play</button></li>
-            );
+            var that = this;
+            const listItems = songs.map(function(song){
+                var duration = dateToStr(song.duration);
+                var icon = that.state.track === song ? <Icon.Disc className="icon" /> : <Icon.Play className="icon" />;
+                return  <li onClick={() => that.playTracks(song)} className={classNames({'playing': that.state.track === song, 'song': true})} key={song.id}>
+                            {icon}
+                            <span className="song-title" title={song.title}>{song.title}<br/><small className="artist" title={song.artist.name}>{song.artist.name}</small></span>
+                            <span className="duration">{duration}</span>
+                        </li>
+            });
 
             return (
-                <div>
+                <div className="content">
                     <DzTrack track={this.state.track}/>
-                    <h3>Dz Flow List</h3>
-                    <ul>{listItems}</ul>
-                    <button onClick={() => this.loadMoreTracks()}>Load more tracks</button>
+                    <div className="tracklist">
+                        <ul className="tracklist-content">
+                            {listItems}
+                            <li className="song"><span className="song-title" onClick={() => this.loadMoreTracks()}><Icon.PlusCircle/></span></li>
+                        </ul>
+                    </div>
                 </div>
             )
         }
@@ -226,7 +323,7 @@ class DzFlowList extends React.Component{
 class DzNextBtn extends React.Component {
     render(){
         return (
-            <button onClick={() => DZ.player.next()}>NEXT</button>
+            <Icon.FastForward className="player-button" onClick={() => DZ.player.next()} />
         )
     }
 }
@@ -234,8 +331,38 @@ class DzNextBtn extends React.Component {
 class DzPrevBtn extends React.Component {
     render(){
         return (
-            <button onClick={() => DZ.player.prev()}>PREV</button>
+            <Icon.Rewind className="player-button" onClick={() => DZ.player.prev()} />
         )
+    }
+}
+
+class DzPlayBtn extends React.Component {
+    constructor() {
+        super();
+        this.state = {
+            isPlaying: false
+        }
+    }
+
+    componentDidMount() {
+        var that = this;
+        DZ.Event.subscribe('player_play', () => {
+            that.setState({isPlaying: true});
+        });
+
+        DZ.Event.subscribe('player_paused', () => {
+            that.setState({isPlaying: false});
+        });
+    }
+
+    render(){
+        var button = this.state.isPlaying ? <Icon.PauseCircle className="play-button" onClick={() => togglePlayer()}/> : <Icon.PlayCircle className="play-button" onClick={() => togglePlayer()}/> ;
+
+        return (
+            <div>
+                {button}
+            </div>
+        );
     }
 }
 
