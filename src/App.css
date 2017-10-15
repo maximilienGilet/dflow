@@ -466,6 +466,81 @@ input[type="range"]::-ms-fill-upper {
     .controls{
         width: calc(800px - 4em);
     }
+
+    @media (max-height:580px) {
+        .album-container{
+            flex-direction: row;
+            height: 100vh;
+        }
+
+        .container{
+            height: 100vh;
+            width: calc(50vw - 2em);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .album{
+            display: none;
+        }
+    }
+}
+
+@media (max-width:800px) {
+    .content{
+        flex-direction: column-reverse;
+    }
+
+    .tracklist{
+        /*width: 100vw;*/
+        width: unset;
+        right: unset;
+        max-height: calc(100vh - 200px);
+        position: unset;
+        box-shadow: unset;
+        box-shadow: inset 0px 0px 2em #111;
+    }
+
+    .track{
+        width: unset;
+        min-height: 200px;
+        background: linear-gradient(right, rgba(34,34,34, 0.6) 0%, rgba(34,34,34, 0.6) 100%);
+    }
+
+
+    .container{
+        padding: unset;
+        width: 100vw;
+    }
+
+    .trackTitle , .trackArtist {
+        padding-left: 1em;
+    }
+
+    .album{
+        display: none;
+    }
+
+    @media (max-height:300px) {
+        .tracklist{
+            display: none;
+        }
+
+        .container{
+            height: 100vh;
+        }
+
+        .container{
+            display: flex;
+            flex-direction: column;
+            justify-content: space-evenly;
+        }
+
+        .track{
+            background: unset;
+        }
+    }
 }
 
 @keyframes spin {
