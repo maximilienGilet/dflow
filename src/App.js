@@ -67,8 +67,8 @@ class App extends Component {
         var thisReact = this;
 
         DZ.init({
-            'appId': '251042',
-            'channelUrl': 'http://react.dev/',
+            'appId': '255682',
+            'channelUrl': 'http://www.dflow.surge.sh/',
             'player' : {
                 onload : function(){
                     DZ.player.setRepeat(1);
@@ -90,10 +90,13 @@ class App extends Component {
 
     render() {
         return this.state.user ? this.renderApp() : (
-            <div className="loader">
-                <span className="loader-item"></span>
-                <span className="loader-item"></span>
-                <span className="loader-item"></span>
+            <div className="loader-container">
+                <img className="logo" src="/dflow.svg" alt="logo"/>
+                <div className="spinner-circle"></div>
+                <div className="loader">
+                    <div className="spinner"></div>
+                    <div className="spinner"></div>
+                </div>
             </div>
         );
     }

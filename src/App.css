@@ -28,11 +28,61 @@ body{
     height: 100vh;
 }
 
-.loader{
+.loader-container{
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
     align-content: stretch;
+    height: 50vh;
+    width: 50vw;
+    position: absolute;
+    left: 25vw;
+    top: 25vh;
+    /*background: url("/dflow.svg");
+    background-repeat: no-repeat;
+    background-position: top;
+    background-size: contain;*/
     /*height: 800px;*/
+}
+
+.spinner-circle{
+    /*left: auto;*/
+    /*right: auto;*/
+    border-radius: 50px/50px;
+    border: solid 0.8em #e9ecef;
+    width: 3em;
+    height: 3em;
+}
+
+.spinner{
+    content: '';
+    width: 1em;
+    height: 5em;
+    /*transform-origin: top;*/
+    background-color: #343a40;
+    position: absolute;
+    bottom: 0;
+    left: calc(50% - 0.5em);
+    animation-name: spin;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+    animation-timing-function: ease-in-out;
+}
+
+.spinner:nth-child(2){
+    animation-name: spin;
+    animation-delay: 0.32s;
+}
+
+.logo{
+    width: 50vw;
+    max-width: 30em;
+}
+
+.loader{
+    position: absolute;
+    bottom: 0;
 }
 
 .loader-item{
@@ -43,6 +93,7 @@ body{
     padding: 8px;
     margin: 2px;
     height: 30px;
+    bottom: 0;
     animation: size 1s ease infinite;
 }
 
@@ -173,6 +224,7 @@ body{
     right: 0;
     position: absolute;
     overflow: scroll;
+    overflow-x: hidden;
     box-shadow: 0 10px 4em #111;
 }
 
@@ -419,6 +471,11 @@ input[type="range"]::-ms-fill-upper {
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+@keyframes spin-double {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(720deg); }
 }
 
 @keyframes size {
