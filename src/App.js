@@ -118,15 +118,8 @@ class App extends Component {
     renderApp() {
         return (
             <div>
-                {/* <button className="user button">
-                    <Icon.User className="user-icon"/>
-                    <span className="user-text">{this.state.user.firstname} {this.state.user.lastname}</span>
-                </button> */}
                 <div className="app">
                     <DzFlowList dz-user={this.state.user}/>
-                    {/* <div className="controls"> */}
-
-                    {/* </div> */}
                 </div>
             </div>
         )
@@ -149,7 +142,7 @@ class DzTrack extends React.Component {
                 'backgroundImage': 'url(' + this.props.track.album.cover_big + ')'
             }
 
-            document.title = this.props.track.title + " - " + this.props.track.artist.name + " - Dflow"; 
+            document.title = this.props.track.title + " - " + this.props.track.artist.name + " - Dflow";
 
             return (
                 <div className="track">
@@ -168,7 +161,6 @@ class DzTrack extends React.Component {
                                 <div className="media-buttons">
                                     <DzProgress id="progress"/>
                                     <div className="buttons">
-                                        {/* <div className="volume-container"><Icon.Volume2 className="rotate90"/><DzVolume volume={DZ.player.getVolume()}/></div> */}
                                         <DzPrevBtn/>
                                         <DzPlayBtn/>
                                         <DzNextBtn/>
@@ -223,7 +215,6 @@ class DzProgress extends React.Component {
                     <div>{timeValue}</div>
                     <div>{timeMax}</div>
                 </div>
-                {/* <progress className="progressbar" id={this.props.id} max={this.state.max} value={this.state.value}></progress> */}
                 <DebounceInput
                     type="range"
                     value={this.state.value}
