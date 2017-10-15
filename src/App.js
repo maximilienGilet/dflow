@@ -3,6 +3,7 @@ import './App.css';
 import classNames from 'classnames';
 import * as Icon from 'react-feather';
 import {DebounceInput} from 'react-debounce-input';
+import Mousetrap from 'mousetrap';
 
 var DZ = window.DZ;
 
@@ -67,8 +68,8 @@ class App extends Component {
         var thisReact = this;
 
         DZ.init({
-            'appId': '255682',
-            'channelUrl': 'http://www.dflow.surge.sh/',
+            'appId': '251042',
+            'channelUrl': 'http://react.dev/',
             'player' : {
                 onload : function(){
                     DZ.player.setRepeat(1);
@@ -86,6 +87,19 @@ class App extends Component {
                 console.log('User cancelled login or did not fully authorize.');
             }
         }, {perms: 'basic_access,email'});
+
+
+        Mousetrap.bind(['space','k'], function(){
+            togglePlayer();
+        });
+
+        Mousetrap.bind(['j', 'left'], function(){
+            DZ.player.prev();
+        });
+
+        Mousetrap.bind(['l', 'right'], function(){
+            DZ.player.next();
+        });
     }
 
     render() {
