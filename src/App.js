@@ -147,7 +147,9 @@ class DzTrack extends React.Component {
             var that = this;
             var containerStyle = {
                 'backgroundImage': 'url(' + this.props.track.album.cover_big + ')'
-            };
+            }
+
+            document.title = this.props.track.title + " - " + this.props.track.artist.name + " - Dflow"; 
 
             return (
                 <div className="track">
