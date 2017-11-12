@@ -17,6 +17,8 @@ No premium account required ! No ads ! Can you believe this ?
 
 ## Features 
 
+**IMPORTANT NOTICE : DFLOW IS CURRENTLY NOT WORKING ON FIREFOX FOR SOME REASONS. HELP APPRECIATED**
+
 - Written with React js
 - Beautiful hand crafted custom design 
 - Fully responsive ! 4 differents layouts !
