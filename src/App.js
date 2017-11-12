@@ -68,8 +68,8 @@ class App extends Component {
         var thisReact = this;
 
         DZ.init({
-            'appId': '251042',
-            'channelUrl': 'http://react.dev/',
+            'appId': '255682',
+            'channelUrl': 'http://dflow.surge.sh/',
             'player' : {
                 onload : function(){
                     DZ.player.setRepeat(1);
@@ -285,15 +285,18 @@ class DzFlowList extends React.Component{
     }
 
     playTracks(track){
-        var id = track.id;
+        var id = track.id
         var firstIndex = this.state.playlist.indexOf(this.state.playlist.find(function(o){
             return o.id == id
         }));
-        var tracksToPlay = this.state.playlist.slice(firstIndex);
-        var tracklist = tracksToPlay.map(function(track){
+        var tracklist = this.state.playlist.map(function(track){
             return track.id;
         });
-        DZ.player.playTracks(tracklist);
+        if(firstIndex !== null){
+            DZ.player.playTracks(tracklist, firstIndex);
+        } else {
+            DZ.player.playTracks(tracklist);
+        }
     }
 
     render(){

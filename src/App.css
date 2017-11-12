@@ -190,7 +190,7 @@ body{
 }
 
 .container{
-    background: linear-gradient(right, rgba(34,34,34, 0.8) 0%, rgba(34,34,34, 0.8) 100%);
+    background: linear-gradient(to left, rgba(34,34,34, 0.8) 0%, rgba(34,34,34, 0.8) 100%);
     padding: 1em;
     width: 50%;
     min-width: 300px;
@@ -215,7 +215,7 @@ body{
     margin: 0;
     /*background: rgba(51,51,51, 0.6), url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='30' height='30'><circle cx='15' cy='15' r='10' /></svg>");
     background-blend-mode: screen;*/
-    background: linear-gradient(right, rgba(51,51,51, 0.6) 0%, rgba(51,51,51, 0.8) 100%);
+    background: linear-gradient(to left, rgba(51,51,51, 0.6) 0%, rgba(51,51,51, 0.8) 100%);
     background-repeat: no-repeat;
     background-position: bottom right;
     border-right: var(--border-radius);
@@ -382,17 +382,20 @@ body{
 }
 
 /*Chrome*/
-@media screen and (-webkit-min-device-pixel-ratio:0) {
+@media screen{
     input[type='range'] {
-      overflow: hidden;
-      width: 100%;
-      height: 0.8em;
-      border-radius: var(--border-radius);
-      -webkit-appearance: none;
-      background-color: #495057;
-      /*display: none;*/
-      /*transform: rotate(-90deg);*/
-      box-shadow: 0 1em 3em var(--color-dark-grey);
+        overflow: hidden;
+        width: 100%;
+        height: 0.8em;
+        border-radius: var(--border-radius);
+        -webkit-appearance: none;
+        -moz-appearance:    none;
+        appearance:         none;
+
+        background-color: #495057;
+        /*display: none;*/
+        /*transform: rotate(-90deg);*/
+        box-shadow: 0 1em 3em var(--color-dark-grey);
     }
 
     input[type="range"]:hover{
@@ -408,6 +411,17 @@ body{
       cursor: ew-resize;
       background-color: var(--color-light);
       box-shadow: -40vw 0 0 40vw var(--color-light);
+    }
+
+    input[type=range]::-moz-range-thumb {
+        width: 6px;
+        /*border-radius: var(--border-radius);*/
+        border-radius: 100%;
+        -webkit-appearance: none;
+        height: 1em;
+        cursor: ew-resize;
+        background-color: var(--color-light);
+        box-shadow: -40vw 0 0 40vw var(--color-light);
     }
 
 }
@@ -505,7 +519,7 @@ input[type="range"]::-ms-fill-upper {
     .track{
         width: unset;
         min-height: 200px;
-        background: linear-gradient(right, rgba(34,34,34, 0.6) 0%, rgba(34,34,34, 0.6) 100%);
+        background: linear-gradient(to left, rgba(34,34,34, 0.6) 0%, rgba(34,34,34, 0.6) 100%);
     }
 
 
