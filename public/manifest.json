@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Dflow",
+  "name": "A simple and beautiful Deezer flow client",
   "icons": [
     {
       "src": "favicon.ico",
